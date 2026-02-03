@@ -1,17 +1,9 @@
 name: CI
 
 on:
-<<<<<<< HEAD
  push:
   branches:
    - main
-=======
-  push:
-    branches: [ "main", "master" ]
-  pull_request:
-    branches: [ "main", "master" ]
-workfliw_dispatch:
->>>>>>> 91b9dd1310a5c173ea48dfc0a472d7ae8c3b6bed
 
 jobs:
  deploy:
