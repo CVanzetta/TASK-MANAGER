@@ -1,12 +1,14 @@
 name: CI
 
 on:
- push:
-  branches:
-   - main
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
 
 jobs:
- deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
