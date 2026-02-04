@@ -39,7 +39,7 @@ jobs:
       - name: Check for security best practices
         run: |
           echo "🔍 Checking security configurations..."
-          
+
           # Check for privileged mode
           if grep -q "privileged: true" docker-compose*.yml; then
             echo "❌ WARNING: Privileged mode detected!"
@@ -47,27 +47,27 @@ jobs:
           else
             echo "✅ No privileged containers"
           fi
-          
+
           # Check for host network mode
           if grep -q "network_mode: host" docker-compose*.yml; then
             echo "⚠️  WARNING: Host network mode detected!"
           else
             echo "✅ No host network mode"
           fi
-          
+
           # Check for version pinning
           if ! grep -q "image:.*:.*" docker-compose.yml; then
             echo "⚠️  WARNING: Some images may not be version-pinned"
           else
             echo "✅ Images appear to be version-pinned"
           fi
-          
+
           echo "✅ Security check completed"
 
       - name: Check for health checks
         run: |
           echo "🏥 Checking for health checks..."
-          
+
           if grep -q "healthcheck:" docker-compose.yml; then
             echo "✅ Health checks are configured"
           else
@@ -77,7 +77,7 @@ jobs:
       - name: Check for resource limits
         run: |
           echo "📊 Checking for resource limits..."
-          
+
           if grep -q "mem_limit\|cpus\|deploy:" docker-compose*.yml; then
             echo "✅ Resource limits configured"
           else
@@ -123,7 +123,7 @@ jobs:
           echo "" >> compose-report.md
           echo "## Volumes" >> compose-report.md
           docker compose -f docker-compose.yml config --volumes >> compose-report.md
-          
+
           cat compose-report.md
 
       - name: Upload analysis report
