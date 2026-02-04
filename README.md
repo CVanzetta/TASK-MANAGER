@@ -1,5 +1,12 @@
 # Task Manager
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=YOUR_PROJECT_KEY&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=YOUR_PROJECT_KEY)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=YOUR_PROJECT_KEY&metric=coverage)](https://sonarcloud.io/summary/new_code?id=YOUR_PROJECT_KEY)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=YOUR_PROJECT_KEY&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=YOUR_PROJECT_KEY)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=YOUR_PROJECT_KEY&metric=bugs)](https://sonarcloud.io/summary/new_code?id=YOUR_PROJECT_KEY)
+
+Application de gestion de tâches avec backend FastAPI et frontend vanilla JS.
+
 ## Installation & usage
 
 ### Backend
@@ -45,3 +52,40 @@ curl -s -X PUT http://127.0.0.1:8000/tasks/1 \
 ```bash
 curl -i -X DELETE http://127.0.0.1:8000/tasks/1
 ```
+
+## Tests
+
+### Exécuter les tests unitaires
+
+```bash
+cd backend
+pip install pytest pytest-cov
+pytest --cov=app --cov-report=html
+```
+
+Le rapport de couverture est disponible dans `backend/htmlcov/index.html`
+
+### Analyse de qualité
+
+```bash
+cd backend
+pip install pylint
+pylint app
+```
+
+## Documentation
+
+- [DEPLOYMENT.md](DEPLOYMENT.md) - Guide de déploiement Docker Compose
+- [SONARCLOUD.md](SONARCLOUD.md) - Configuration et utilisation de SonarCloud
+- [DOCKERFILE_QUALITY.md](DOCKERFILE_QUALITY.md) - Qualité et sécurité des Dockerfiles
+
+## CI/CD
+
+Le projet utilise GitHub Actions pour :
+- ✅ Build et push des images Docker
+- ✅ Scan de vulnérabilités (Trivy, Grype)
+- ✅ Tests et analyse de code (SonarCloud)
+- ✅ Validation des Dockerfiles (Hadolint)
+- ✅ Analyse des fichiers Docker Compose
+- ✅ Pre-commit hooks (trailing whitespace, YAML, etc.)
+

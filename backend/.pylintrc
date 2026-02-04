@@ -1,0 +1,20 @@
+[MASTER]
+ignore=tests,venv,.venv
+
+[MESSAGES CONTROL]
+disable=
+    C0111,  # missing-docstring
+    C0103,  # invalid-name
+    R0903,  # too-few-public-methods
+    W0212,  # protected-access
+
+[FORMAT]
+max-line-length=120
+indent-string='    '
+
+[BASIC]
+good-names=i,j,k,db,id,_
+
+[DESIGN]
+max-args=7
+max-attributes=10
