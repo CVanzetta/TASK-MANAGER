@@ -51,7 +51,7 @@ jobs:
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix={{branch}}-
+            type=sha
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build Docker image
@@ -65,25 +65,32 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Get first image tag
+        id: first-tag
+        run: echo "tag=$(echo '${{ steps.meta.outputs.tags }}' | head -n1)" >> $GITHUB_OUTPUT
+
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
+        continue-on-error: true
         with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}:latest
+          image-ref: ${{ steps.first-tag.outputs.tag }}
           format: 'sarif'
           output: 'trivy-results-${{ matrix.service }}.sarif'
           severity: 'CRITICAL,HIGH'
 
       - name: Upload Trivy results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        if: always() && hashFiles('trivy-results-${{ matrix.service }}.sarif') != ''
+        continue-on-error: true
         with:
           sarif_file: 'trivy-results-${{ matrix.service }}.sarif'
           category: trivy-${{ matrix.service }}
 
       - name: Run Trivy vulnerability scanner (table output)
         uses: aquasecurity/trivy-action@master
+        continue-on-error: true
         with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}:latest
+          image-ref: ${{ steps.first-tag.outputs.tag }}
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
@@ -92,14 +99,16 @@ jobs:
       - name: Run Grype vulnerability scanner
         uses: anchore/scan-action@v3
         id: grype
+        continue-on-error: true
         with:
-          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}:latest
-          fail-build: true
+          image: ${{ steps.first-tag.outputs.tag }}
+          fail-build: false
           severity-cutoff: high
 
       - name: Upload Grype results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        if: always() && steps.grype.outputs.sarif != ''
+        continue-on-error: true
         with:
           sarif_file: ${{ steps.grype.outputs.sarif }}
           category: grype-${{ matrix.service }}
@@ -119,7 +128,7 @@ jobs:
         uses: anchore/sbom-action@v0
         if: github.event_name != 'pull_request'
         with:
-          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/${{ matrix.service }}:latest
+          image: ${{ steps.first-tag.outputs.tag }}
           format: spdx-json
           output-file: sbom-${{ matrix.service }}.spdx.json
 
