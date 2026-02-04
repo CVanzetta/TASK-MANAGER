@@ -1,0 +1,135 @@
+name: Analyze Docker Compose
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'docker-compose*.yml'
+      - '.github/workflows/analyze-compose.yml'
+  pull_request:
+    branches:
+      - main
+      - master
+    paths:
+      - 'docker-compose*.yml'
+
+jobs:
+  analyze-compose:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate docker-compose.yml syntax
+        run: |
+          docker compose -f docker-compose.yml config > /dev/null
+          echo "✅ docker-compose.yml is valid"
+
+      - name: Validate docker-compose.dev.yml syntax
+        run: |
+          docker compose -f docker-compose.dev.yml config > /dev/null
+          echo "✅ docker-compose.dev.yml is valid"
+
+      - name: Check for security best practices
+        run: |
+          echo "🔍 Checking security configurations..."
+          
+          # Check for privileged mode
+          if grep -q "privileged: true" docker-compose*.yml; then
+            echo "❌ WARNING: Privileged mode detected!"
+            exit 1
+          else
+            echo "✅ No privileged containers"
+          fi
+          
+          # Check for host network mode
+          if grep -q "network_mode: host" docker-compose*.yml; then
+            echo "⚠️  WARNING: Host network mode detected!"
+          else
+            echo "✅ No host network mode"
+          fi
+          
+          # Check for version pinning
+          if ! grep -q "image:.*:.*" docker-compose.yml; then
+            echo "⚠️  WARNING: Some images may not be version-pinned"
+          else
+            echo "✅ Images appear to be version-pinned"
+          fi
+          
+          echo "✅ Security check completed"
+
+      - name: Check for health checks
+        run: |
+          echo "🏥 Checking for health checks..."
+          
+          if grep -q "healthcheck:" docker-compose.yml; then
+            echo "✅ Health checks are configured"
+          else
+            echo "⚠️  WARNING: No health checks found"
+          fi
+
+      - name: Check for resource limits
+        run: |
+          echo "📊 Checking for resource limits..."
+          
+          if grep -q "mem_limit\|cpus\|deploy:" docker-compose*.yml; then
+            echo "✅ Resource limits configured"
+          else
+            echo "⚠️  INFO: Consider adding resource limits"
+          fi
+
+      - name: Scan docker-compose with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-compose-results.sarif'
+          severity: 'MEDIUM,HIGH,CRITICAL'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: 'trivy-compose-results.sarif'
+          category: trivy-compose
+
+      - name: Test compose deployment (dry-run)
+        run: |
+          echo "🧪 Testing compose configuration..."
+          docker compose -f docker-compose.dev.yml config
+          echo "✅ Compose configuration is valid and ready for deployment"
+
+      - name: Generate deployment report
+        if: always()
+        run: |
+          echo "# Docker Compose Analysis Report" > compose-report.md
+          echo "" >> compose-report.md
+          echo "## Configuration Files" >> compose-report.md
+          echo "- docker-compose.yml (production)" >> compose-report.md
+          echo "- docker-compose.dev.yml (development)" >> compose-report.md
+          echo "" >> compose-report.md
+          echo "## Services" >> compose-report.md
+          docker compose -f docker-compose.yml config --services >> compose-report.md
+          echo "" >> compose-report.md
+          echo "## Networks" >> compose-report.md
+          docker compose -f docker-compose.yml config --networks >> compose-report.md
+          echo "" >> compose-report.md
+          echo "## Volumes" >> compose-report.md
+          docker compose -f docker-compose.yml config --volumes >> compose-report.md
+          
+          cat compose-report.md
+
+      - name: Upload analysis report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: compose-analysis-report
+          path: compose-report.md
+          retention-days: 30
