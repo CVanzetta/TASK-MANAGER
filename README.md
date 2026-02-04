@@ -1,9 +1,9 @@
 # Task Manager
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=YOUR_PROJECT_KEY&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=YOUR_PROJECT_KEY)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=YOUR_PROJECT_KEY&metric=coverage)](https://sonarcloud.io/summary/new_code?id=YOUR_PROJECT_KEY)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=YOUR_PROJECT_KEY&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=YOUR_PROJECT_KEY)
-[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=YOUR_PROJECT_KEY&metric=bugs)](https://sonarcloud.io/summary/new_code?id=YOUR_PROJECT_KEY)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=CVanzetta_TASK-MANAGER&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=CVanzetta_TASK-MANAGER)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=CVanzetta_TASK-MANAGER&metric=coverage)](https://sonarcloud.io/summary/new_code?id=CVanzetta_TASK-MANAGER)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=CVanzetta_TASK-MANAGER&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=CVanzetta_TASK-MANAGER)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=CVanzetta_TASK-MANAGER&metric=bugs)](https://sonarcloud.io/summary/new_code?id=CVanzetta_TASK-MANAGER)
 
 Application de gestion de tâches avec backend FastAPI et frontend vanilla JS.
 
