@@ -1,0 +1,10 @@
+ignored:
+  # Ignore pinning apt packages for ImageMagick (we need specific version for CVE fix)
+  - DL3008
+
+trustedRegistries:
+  - docker.io
+  - nginx
+  - python
+
+failure-threshold: warning
